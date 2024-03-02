@@ -1,0 +1,68 @@
+# version: '3.8'
+
+# services:
+#  web:
+#     build: .
+#     command: ["gunicorn", "-b", "0.0.0.0:5000", "app:create_app()"]
+#     volumes:
+#       - .:/app
+#     ports:
+#       - "8000:5000"
+#     depends_on:
+#       - db
+#     environment:
+#       - FLASK_APP=app/__init__.py
+#       - FLASK_ENV=development
+#       - SQLALCHEMY_DATABASE_URI = 'mysql://root:@localhost/flaskdb'
+#  db:
+#     image: mysql:latest
+#     environment:
+#       - MYSQL_ROOT_PASSWORD=root
+#       - MYSQL_DATABASE=flaskdb
+#       - MYSQL_USER=root
+#       - MYSQL_PASSWORD=root
+#     volumes:
+#       - db_data:/var/lib/mysql
+
+# volumes:
+#  db_data:
+
+version: '3.8'
+
+services:
+ web:
+    build: .
+    command: ["gunicorn", "-b", "0.0.0.0:5000", "app:create_app()"]
+    volumes:
+      - .:/app
+    ports:
+      - "8000:5000"
+    depends_on:
+      - db
+    environment:
+      - FLASK_APP=app/__init__.py
+      - FLASK_ENV=development
+      - MYSQL_HOST=db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DB=flaskdb
+      - MYSQL_PORT=3306
+    networks:
+      - app-network
+
+ db:
+    image: mysql:latest
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes # This allows an empty password for the root user
+      - MYSQL_DATABASE=flaskdb
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+networks:
+ app-network:
+    driver: bridge
+
+volumes:
+ db_data:
